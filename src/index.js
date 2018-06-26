@@ -11,14 +11,16 @@ const BACKUP_INSTANCES = process.env.BACKUP_INSTANCES.split(',');
 let allSnapshots;
 let backupsByInstance = {};
 
-exports.handler = async (event, context, callback) => {
-  for (let instance of BACKUP_INSTANCES) {
-    let latest = await getLatestBackup(instance);
-
-    if (latest.createdAt.toDateString() !== (new Date()).toDateString()) {
-      createBackup(instance);
+exports.handler = (event, context, callback) => {
+  (async function(){
+    for (let instance of BACKUP_INSTANCES) {
+      let latest = await getLatestBackup(instance);
+  
+      if (latest.createdAt.toDateString() !== (new Date()).toDateString()) {
+        createBackup(instance);
+      }
     }
-  }
+  })();
 };
 
 async function getBackups(instance) {
@@ -53,11 +55,20 @@ function dateSort(a, b){
 }
 
 function createBackup(instance) {
+  console.log(`Creating backup of ${instance}`);
+
   let date = new Date();
   let name = `${instance}-${date.getTime()}-autosnap`;
-
-  return lightsail.createInstanceSnapshot({
+  let params = {
     instanceName: instance,
     instanceSnapshotName: name
-  }).promise();
+  };
+
+  lightsail.createInstanceSnapshot(params, function(err, data) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(data);
+    }
+  });
 }
