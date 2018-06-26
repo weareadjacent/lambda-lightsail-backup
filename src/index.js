@@ -11,12 +11,17 @@ const lightsail = new AWS.Lightsail();
  */
 const BACKUP_INSTANCES = process.env.BACKUP_INSTANCES.split(',');
 
+const BACKUP_DAYS = 7;
+const BACKUP_WEEKS = 4;
+const BACKUP_MONTHS = 3;
+
 /**
  * Convenience for calculating dates
  * @type {Date}
  */
 const NOW = new Date();
 const NOW_DATE_STRING = NOW.toDateString();
+const ONE_DAY = 1000 * 60 * 60 * 24;
 
 /**
  * Store backups chronologically, keyed by instance name.
@@ -61,8 +66,8 @@ async function loadBackups() {
   }
 
   // Sort by date.
-  for (let [instance, backups] of Object.entries(backups)) {
-    backups.sort((a, b) => a.createdAt - b.createdAt);
+  for (let [instance, instanceBackups] of Object.entries(backups)) {
+    instanceBackups.sort((a, b) => a.createdAt - b.createdAt);
   }
 }
 
@@ -81,7 +86,7 @@ function shouldBackupInstance(instance) {
 }
 
 function getLatestBackup(instance) {
-  return backups[instance][backups[instance]length - 1];
+  return backups[instance][backups[instance].length - 1];
 }
 
 function hasBackupToday(instance) {
@@ -111,4 +116,51 @@ function createBackup(instance) {
 
 function pruneBackups(instance) {
   console.log(`${instance}: Pruning backups`);
+
+  for (let backup of backups[instance]) {
+    let date = backup.createdAt;
+    let dayOfWeek = date.getDay();
+    let dayOfMonth = date.getDate();
+    let age = Math.floor((NOW - date) / ONE_DAY);
+
+    let saveBackup = false;
+
+    if (age <= BACKUP_DAYS) {
+      console.log(`${instance}: Saving daily backup from ${backup.createdAt}`);
+      saveBackup = true;
+    } else if (age <= BACKUP_WEEKS * 7) {
+      // Is sunday?
+      if (dayOfWeek === 0) {
+        console.log(`${instance}: Saving weekly backup from ${backup.createdAt}`);
+        saveBackup = true;
+      }
+    } else if (age <= BACKUP_MONTHS * 30) {
+      if (
+        dayOfMonth <= 7 && // Is first week of month?
+        dayOfWeek === 0 // Is Sunday?
+      ) {
+        console.log(`${instance}: Saving monthly backup from ${backup.createdAt}`);
+        saveBackup = true;
+      }
+    }
+
+    if (!saveBackup) {
+      console.log(`${instance}: Deleting backup from ${backup.createdAt}`);
+      deleteSnapshot(backup);
+    }
+  }
+}
+
+function deleteSnapshot(snapshot) {
+  let params = {
+    instanceSnapshotName: snapshot.name
+  };
+
+  // Lightsail.deleteInstanceSnapshot(paramsDelete, function(err, data) {
+  //   if (err) {
+  //     console.error(`${instance}: Error deleting snapshot ${snapshot.name}`, err);
+  //   } else {
+  //     console.log(`${instance}: Snapshot ${snapshot.name} deleted`);
+  //   }
+  // });
 }
