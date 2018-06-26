@@ -155,11 +155,11 @@ function deleteSnapshot(snapshot) {
     instanceSnapshotName: snapshot.name
   };
 
-  Lightsail.deleteInstanceSnapshot(params, function(err, data) {
+  lightsail.deleteInstanceSnapshot(params, function(err, data) {
     if (err) {
-      console.error(`${instance}: Error deleting snapshot ${snapshot.name}`, err);
+      console.error(`${snapshot.fromInstanceName}: Error deleting snapshot ${snapshot.name}`, err);
     } else {
-      console.log(`${instance}: Snapshot ${snapshot.name} deleted`);
+      console.log(`${snapshot.fromInstanceName}: Snapshot ${snapshot.name} deleted`);
     }
   });
 }
