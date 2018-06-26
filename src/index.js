@@ -97,8 +97,7 @@ function hasBackupToday(instance) {
 function createBackup(instance) {
   console.log(`${instance}: Creating backup`);
 
-  let date = new Date();
-  let name = `${instance}-${date.getTime()}-autosnap`;
+  let name = `${instance}-${NOW.getTime()}-autosnap`;
   let params = {
     instanceName: instance,
     instanceSnapshotName: name
