@@ -1,7 +1,6 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-AWS.config.setPromisesDependency(null);
 AWS.config.update({region: 'us-east-1'});
 
 const lightsail = new AWS.Lightsail();
