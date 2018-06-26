@@ -126,12 +126,12 @@ function pruneBackups(instance) {
     let saveBackup = false;
 
     if (age <= BACKUP_DAYS) {
-      console.log(`${instance}: Saving daily backup from ${backup.createdAt}`);
+      console.log(`${instance}: Retaining daily backup from ${backup.createdAt}`);
       saveBackup = true;
     } else if (age <= BACKUP_WEEKS * 7) {
       // Is sunday?
       if (dayOfWeek === 0) {
-        console.log(`${instance}: Saving weekly backup from ${backup.createdAt}`);
+        console.log(`${instance}: Retaining weekly backup from ${backup.createdAt}`);
         saveBackup = true;
       }
     } else if (age <= BACKUP_MONTHS * 30) {
@@ -139,7 +139,7 @@ function pruneBackups(instance) {
         dayOfMonth <= 7 && // Is first week of month?
         dayOfWeek === 0 // Is Sunday?
       ) {
-        console.log(`${instance}: Saving monthly backup from ${backup.createdAt}`);
+        console.log(`${instance}: Retaining monthly backup from ${backup.createdAt}`);
         saveBackup = true;
       }
     }
