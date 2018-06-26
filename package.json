@@ -1,14 +1,18 @@
 {
   "name": "lambda-lightsail-backup",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.263.1"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "description": ""
 }
