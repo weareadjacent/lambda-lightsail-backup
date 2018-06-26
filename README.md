@@ -6,8 +6,6 @@ Inspired by/based on [vidanov/lambda-nodejs-lightsail-backup](https://github.com
 
 ## Setup
 
-We need to set up some permissions, so that our Lambda function has enough rights to do the job.
-
 ### Step 1. Create the IAM policy
 
  1. As root, sign into the [AWS console](https://aws.amazon.com).
@@ -35,7 +33,7 @@ We need to set up some permissions, so that our Lambda function has enough right
         }
 
  1. Click **Review Policy**.
- 1. Give it the name **`Lightsail_Snapshots`**, a description if desired, and click **Create Policy**.
+ 1. Give it the name **`LightsailSnapshots`**, a description if desired, and click **Create Policy**.
 
 ### Step 2. Create the IAM role
 
@@ -43,9 +41,9 @@ We need to set up some permissions, so that our Lambda function has enough right
 1. Under the **AWS Service** tab, click **Lambda** in the services list.
 1. Click **Next: Permissions**.
 1. In the search field, type **`AWSLambdaBasicExecutionRole`** and check the box for it.
-1. Also in the search field, type **`Lightsail_Snapshots`** and check the box for it too.
+1. Also in the search field, type **`LightsailSnapshots`** and check the box for it too.
 1. Click **Next: Review**.
-1. Give the role name **`Lightsail_Snapshots_Role`** push the button CREATE ROLE
+1. Give the role name **`LightsailSnapshotsRole`** click **Create Role**.
 
 ### Step 3. Create Lambda function
 
@@ -54,7 +52,7 @@ We need to set up some permissions, so that our Lambda function has enough right
  1. from the preselected **Author From Scratch** tab:
     - Set the name to **`lightsail-backups`**.
     - Set the runtime to **Node.js 8.10**.
-    - Select the existing role **`Lightsail_Snapshots_Role`** you created in the step 2.
+    - Select the existing role **`LightsailSnapshotsRole`** you created in the step 2.
  1. Click **Create Function**.
  1. In the design panel, click **Add triggers**, then **CloudWatch Event**.
  1. In the **Rule** section, click **Create a new rule**.
