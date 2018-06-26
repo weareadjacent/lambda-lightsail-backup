@@ -2,21 +2,26 @@
 
 const AWS = require('aws-sdk');
 AWS.config.setPromisesDependency(null);
-AWS.config.update({ region: 'us-east-1' });
+AWS.config.update({region: 'us-east-1'});
+
 const lightsail = new AWS.Lightsail();
 
 const BACKUP_INSTANCES = process.env.BACKUP_INSTANCES.split(',');
+
 let allSnapshots;
 let backupsByInstance = {};
 
 exports.handler = async (event, context, callback) => {
   for (let instance of BACKUP_INSTANCES) {
-    let snapshots = await getBackups(instance);
-    console.log(snapshots);
+    let latest = await getLatestBackup(instance);
+
+    if (latest.createdAt.toDateString() !== (new Date()).toDateString()) {
+      createBackup(instance);
+    }
   }
 };
 
-async function getBackups(instanceName) {
+async function getBackups(instance) {
   if (!allSnapshots) {
     allSnapshots = (await lightsail.getInstanceSnapshots().promise()).instanceSnapshots;
 
@@ -35,9 +40,24 @@ async function getBackups(instanceName) {
     }
   }
 
-  return backupsByInstance[instanceName];
+  return backupsByInstance[instance];
+}
+
+async function getLatestBackup(instance) {
+  let backups = await getBackups(instance);
+  return backups[backups.length - 1];
 }
 
 function dateSort(a, b){
-  return new Date(a.createdAt) - new Date(b.createdAt);
+  return a.createdAt - b.createdAt;
+}
+
+function createBackup(instance) {
+  let date = new Date();
+  let name = `${instance}-${date.getTime()}-autosnap`;
+
+  return lightsail.createInstanceSnapshot({
+    instanceName: instance,
+    instanceSnapshotName: name
+  }).promise();
 }
