@@ -77,8 +77,7 @@ async function loadBackups() {
  * @return {Boolean}
  */
 function isBackupSnapshot(snapshot) {
-  return true;
-  // return snapshot.name.endsWith('-autosnap');
+  return snapshot.name.endsWith('-autosnap');
 }
 
 function shouldBackupInstance(instance) {
