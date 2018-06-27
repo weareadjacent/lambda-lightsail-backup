@@ -105,12 +105,20 @@ function shouldBackupInstance(instance) {
 }
 
 function getLatestBackup(instance) {
-  return backups[instance][backups[instance].length - 1];
+  let instanceBackups = backups[instance];
+  if (!instanceBackups || instanceBackups.length === 0) {
+    return null;
+  }
+
+  return instanceBackups[instanceBackups.length - 1];
 }
 
 function hasBackupToday(instance) {
   console.log(`${instance}: Checking for today's backup`);
+
   let latest = getLatestBackup(instance);
+  if (!latest) return false;
+
   return latest.createdAt.toDateString() === NOW_DATE_STRING;
 }
 
@@ -135,7 +143,10 @@ function createBackup(instance) {
 function pruneBackups(instance) {
   console.log(`${instance}: Pruning backups`);
 
-  for (let backup of backups[instance]) {
+  let instanceBackups = backups[instance];
+  if (!instanceBackups) return;
+
+  for (let backup of instanceBackups) {
     let date = backup.createdAt;
     let dayOfWeek = date.getDay();
     let dayOfMonth = date.getDate();
