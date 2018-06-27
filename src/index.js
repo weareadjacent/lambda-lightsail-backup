@@ -1,19 +1,39 @@
 'use strict';
 
+// Load AWS APIs
 const AWS = require('aws-sdk');
+// TODO enable different regions.
 AWS.config.update({region: 'us-east-1'});
-
 const lightsail = new AWS.Lightsail();
 
 /**
- * List of target instances from environment variables.
- * @type {Array}
+ * (Required) List of target instances that should be backed up. Provide via
+ * environment variable. Should be a comma-separated list of instance names
+ * (no spaces).
+ * @type {String}
  */
-const BACKUP_INSTANCES = process.env.BACKUP_INSTANCES.split(',');
+const BACKUP_INSTANCES = process.env.BACKUP_INSTANCES.split(',') || [];
 
-const BACKUP_DAYS = 7;
-const BACKUP_WEEKS = 4;
-const BACKUP_MONTHS = 3;
+/**
+ * How many days to keep daily backups. Can be overridden via
+ * environment variable.
+ * @type {Number}
+ */
+const BACKUP_DAYS = process.env.BACKUP_DAYS || 14;
+
+/**
+ * How many weeks to keep weekly backups. Can be overridden via
+ * environment variable.
+ * @type {Number}
+ */
+const BACKUP_WEEKS = process.env.BACKUP_WEEKS || 12;
+
+/**
+ * How many months to keep monthly backups. Can be overridden via
+ * environment variable.
+ * @type {Number}
+ */
+const BACKUP_MONTHS = process.env.BACKUP_MONTHS || 12;
 
 /**
  * Convenience for calculating dates
