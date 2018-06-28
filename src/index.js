@@ -135,7 +135,7 @@ function createBackup(instance) {
     if (err) {
       console.error(`${instance}: Error creating snapshot`, err);
     } else {
-      console.log(`${instance}: Snapshot created`, data);
+      console.log(`${instance}: Snapshot ${name} created`);
     }
   });
 }
