@@ -68,8 +68,19 @@ exports.handler = (event, context, callback) => {
 };
 
 async function loadBackups() {
-  // TODO handle paging
-  let snapshots = (await lightsail.getInstanceSnapshots().promise()).instanceSnapshots;
+  let page = 1;
+  console.log(`Loading all snapshots (page ${page})`);
+
+  let result = (await lightsail.getInstanceSnapshots().promise());
+  let snapshots = result.instanceSnapshots;
+
+  // Get all pages, if applicable.
+  while (result.nextPageToken) {
+    page++;
+    console.log(`Loading all snapshots (page ${page})`);
+    result = (await lightsail.getInstanceSnapshots({pageToken: result.nextPageToken}).promise());
+    snapshots = snapshots.concat(result.instanceSnapshots);
+  }
 
   for (let snapshot of snapshots) {
     // Ignore snapshots not created via this script.
